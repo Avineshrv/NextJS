@@ -1,8 +1,108 @@
-import React, { useEffect } from 'react';
+.watchlist-popup {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; justify-content: flex-end;
+
+  &__backdrop {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.5);
+  }
+
+  &__panel {
+    position: relative;
+    width: 100%; max-height: 100%;
+    background: #fff;
+    border-radius: 1rem 1rem 0 0;
+    overflow-y: auto;
+    transform: translateY(100%);
+    animation: slideUp 0.3s ease-out forwards;
+
+    &.closing {
+      animation: slideDown 0.3s ease-in forwards;
+    }
+  }
+
+  &__header {
+    display: flex; align-items: center;
+    padding: 1rem; border-bottom: 1px solid #eee;
+  }
+  &__close {
+    font-size: 1.5rem;
+    background: none; border: none;
+    margin-right: 1rem; cursor: pointer;
+  }
+  &__title {
+    font-size: 1.25rem; margin: 0;
+  }
+
+  &__filters {
+    display: flex; gap: 1rem;
+    overflow-x: auto; padding: 0 1rem; margin: 1rem 0;
+  }
+  &__filter-btn {
+    background: none; border: none;
+    padding: 0.5rem; font-size: 0.875rem;
+    color: #666; cursor: pointer;
+    &.active {
+      color: #333; font-weight: bold;
+      border-bottom: 2px solid #333;
+    }
+  }
+
+  &__metrics {
+    display: flex; justify-content: space-around;
+    padding: 1rem; border-bottom: 1px solid #eee;
+  }
+  &__metric {
+    text-align: center;
+    small { color: #666; font-size: 0.875rem; }
+    p { margin: 0.25rem 0 0; font-size: 1.25rem; color: #333; }
+  }
+
+  &__chart {
+    padding: 1rem;
+    &-placeholder {
+      height: 200px; background: #f5f5f5;
+      border-radius: 0.5rem;
+      display: flex; align-items: center;
+      justify-content: center; color: #999;
+    }
+  }
+
+  &__poll {
+    padding: 1rem;
+    &-bar {
+      display: flex; height: 0.75rem;
+      border-radius: 0.375rem; overflow: hidden;
+      background: #e0e0e0; margin-bottom: 0.5rem;
+      &-sell { background: #e74c3c; }
+      &-buy  { background: #27ae60; }
+    }
+    &-labels {
+      display: flex; justify-content: space-between;
+      .sell-label { color: #e74c3c; font-size: 0.875rem; }
+      .buy-label  { color: #27ae60; font-size: 0.875rem; }
+    }
+  }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes slideDown {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
+}
+
+
+import React, { useEffect, useState } from 'react';
 import './watchlist-popup.scss';
 
 export default function WatchlistPopup({ data, onClose }) {
-  // prevent body scroll while popup is open
+  const [closing, setClosing] = useState(false);
+  const [period, setPeriod] = useState('3M');
+  const periods = ['1D','1W','1M','3M','6M','1Y','5Y'];
+
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
@@ -10,31 +110,47 @@ export default function WatchlistPopup({ data, onClose }) {
 
   if (!data) return null;
 
-  // hard-coded for demo; replace with real values or props
+  const handleClose = () => {
+    setClosing(true);
+  };
+
+  const handleAnimationEnd = () => {
+    if (closing) onClose();
+  };
+
+  // dummy values
   const dailyLow = '1.3424';
   const dailyHigh = '1.3435';
-  const sellPct   = 29;
-  const buyPct    = 71;
+  const sellPct = 29, buyPct = 71;
 
   return (
     <div className="watchlist-popup">
-      {/* semi-transparent backdrop */}
-      <div className="watchlist-popup__backdrop" onClick={onClose} />
+      <div className="watchlist-popup__backdrop" onClick={handleClose} />
 
-      {/* sliding content panel */}
-      <div className="watchlist-popup__panel">
+      <div
+        className={`watchlist-popup__panel${closing ? ' closing' : ''}`}
+        onAnimationEnd={handleAnimationEnd}
+      >
         <header className="watchlist-popup__header">
-          <button
-            className="watchlist-popup__close"
-            aria-label="Close"
-            onClick={onClose}
-          >
+          <button className="watchlist-popup__close" onClick={handleClose}>
             ×
           </button>
           <h2 className="watchlist-popup__title">
             {data.from} → {data.to}
           </h2>
         </header>
+
+        <div className="watchlist-popup__filters">
+          {periods.map(p => (
+            <button
+              key={p}
+              className={`watchlist-popup__filter-btn${p === period ? ' active' : ''}`}
+              onClick={() => setPeriod(p)}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
 
         <section className="watchlist-popup__metrics">
           <div className="watchlist-popup__metric">
@@ -48,9 +164,8 @@ export default function WatchlistPopup({ data, onClose }) {
         </section>
 
         <section className="watchlist-popup__chart">
-          {/* TODO: swap in your chart component here */}
           <div className="watchlist-popup__chart-placeholder">
-            Chart goes here
+            Chart for {period}
           </div>
         </section>
 
@@ -73,127 +188,4 @@ export default function WatchlistPopup({ data, onClose }) {
       </div>
     </div>
   );
-}
-
-
-.watchlist-popup {
-  position: fixed;
-  inset: 0;                      // top/right/bottom/left: 0
-  z-index: 1000;
-  display: flex;
-  justify-content: flex-end;     // push panel up from bottom
-
-  &__backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-  }
-
-  &__panel {
-    position: relative;
-    background: #fff;
-    width: 100%;
-    max-height: 100%;
-    border-radius: 1rem 1rem 0 0;
-    overflow-y: auto;
-    transform: translateY(100%);
-    animation: slideUp 0.3s ease-out forwards;
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid #eee;
-  }
-
-  &__close {
-    font-size: 1.5rem;
-    line-height: 1;
-    background: none;
-    border: none;
-    margin-right: 1rem;
-    cursor: pointer;
-  }
-
-  &__title {
-    font-size: 1.25rem;
-    margin: 0;
-  }
-
-  &__metrics {
-    display: flex;
-    justify-content: space-around;
-    padding: 1rem;
-    border-bottom: 1px solid #eee;
-
-    &__metric {
-      text-align: center;
-
-      small {
-        color: #666;
-        font-size: 0.875rem;
-      }
-
-      p {
-        margin: 0.25rem 0 0;
-        font-size: 1.25rem;
-        color: #333;
-      }
-    }
-  }
-
-  &__chart {
-    padding: 1rem;
-
-    &-placeholder {
-      height: 200px;
-      background: #f5f5f5;
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #999;
-    }
-  }
-
-  &__poll {
-    padding: 1rem;
-
-    &-bar {
-      display: flex;
-      height: 0.75rem;
-      border-radius: 0.375rem;
-      overflow: hidden;
-      background: #e0e0e0;
-      margin-bottom: 0.5rem;
-
-      &-sell {
-        background: #e74c3c;  // red
-      }
-
-      &-buy {
-        background: #27ae60;  // green
-      }
-    }
-
-    &-labels {
-      display: flex;
-      justify-content: space-between;
-
-      .sell-label {
-        color: #e74c3c;
-        font-size: 0.875rem;
-      }
-      .buy-label {
-        color: #27ae60;
-        font-size: 0.875rem;
-      }
-    }
-  }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
 }
