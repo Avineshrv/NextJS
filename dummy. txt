@@ -1,52 +1,89 @@
-// CutCard.jsx
 import React from 'react';
-import './CutCard.scss';
+import './fx-polls.scss';
 
-export default function CutCard({ title, children }) {
+const FxPollsBar = ({ sellPercent = 29, buyPercent = 71 }) => {
   return (
-    <div className="cut-card">
-      <h2 className="cut-card__title">{title}</h2>
-      <div className="cut-card__body">{children}</div>
+    <div className="fx-polls">
+      <div className="fx-polls__labels">
+        <div className="fx-polls__label fx-polls__label--sell">
+          Selling {sellPercent}% <span>USD</span>
+        </div>
+        <div className="fx-polls__label fx-polls__label--buy">
+          {buyPercent}% Buying <span>USD</span>
+        </div>
+      </div>
+      <div className="fx-polls__bar">
+        <div
+          className="fx-polls__bar-segment fx-polls__bar-segment--sell"
+          style={{ width: `${sellPercent}%` }}
+        />
+        <div
+          className="fx-polls__bar-segment fx-polls__bar-segment--buy"
+          style={{ width: `${buyPercent}%` }}
+        />
+      </div>
     </div>
   );
-}
+};
 
-/* CutCard.scss */
-$notch-diameter: 40px;
-$notch-radius: $notch-diameter / 2;
-$page-bg: #f0f0f0;  /* change to your page’s background */
+export default FxPollsBar;
 
-.cut-card {
-  position: relative;
-  overflow: visible;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 16px;
 
-  /* left & right notches */
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    width: $notch-diameter;
-    height: $notch-diameter;
-    background: $page-bg;
-    border-radius: 50%;
-    top: 50%;
-    transform: translateY(-50%);
+.fx-polls {
+  border: 1px solid #dcdcdc;
+  border-radius: 1rem;
+  padding: 1rem;
+  width: 100%;
+  background: white;
+
+  &__labels {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
   }
 
-  &::before { left: -$notch-radius; }
-  &::after  { right: -$notch-radius; }
+  &__label {
+    font-size: 1rem;
 
-  &__title {
-    margin: 0 0 12px;
-    font-size: 1.25rem;
-    text-align: center;
+    span {
+      display: block;
+      font-weight: normal;
+      font-size: 0.875rem;
+    }
+
+    &--sell {
+      color: #b00020;
+    }
+
+    &--buy {
+      color: #1b5e20;
+      text-align: right;
+    }
   }
 
-  &__body {
-    /* your body styles here */
+  &__bar {
+    display: flex;
+    height: 12px;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 6px;
+    background-color: #eee;
+  }
+
+  &__bar-segment {
+    height: 100%;
+
+    &--sell {
+      background-color: #d32f2f;
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+    }
+
+    &--buy {
+      background-color: #388e3c;
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
   }
 }
