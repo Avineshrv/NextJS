@@ -1,89 +1,122 @@
 import React from 'react';
-import './fx-polls.scss';
+import './FxPollsBar.scss';
 
-const FxPollsBar = ({ sellPercent = 29, buyPercent = 71 }) => {
-  return (
-    <div className="fx-polls">
-      <div className="fx-polls__labels">
-        <div className="fx-polls__label fx-polls__label--sell">
-          Selling {sellPercent}% <span>USD</span>
-        </div>
-        <div className="fx-polls__label fx-polls__label--buy">
-          {buyPercent}% Buying <span>USD</span>
-        </div>
+const FxPollsBar = ({
+  sellPercent = 0,
+  buyPercent = 0,
+}) => (
+  <div className="fx-polls">
+    <div className="fx-polls__labels">
+      <div className="fx-polls__label fx-polls__label--sell">
+        <span className="fx-polls__label-price">
+          {`Selling ${sellPercent}%`}
+        </span>
+        <span className="fx-polls__label-currency">USD</span>
       </div>
+
       <div className="fx-polls__bar">
         <div
           className="fx-polls__bar-segment fx-polls__bar-segment--sell"
           style={{ width: `${sellPercent}%` }}
         />
+        <div className="fx-polls__bar-segment fx-polls__bar-segment--gap" />
         <div
           className="fx-polls__bar-segment fx-polls__bar-segment--buy"
           style={{ width: `${buyPercent}%` }}
         />
       </div>
+
+      <div className="fx-polls__label fx-polls__label--buy">
+        <span className="fx-polls__label-price">
+          {`${buyPercent}% Buying`}
+        </span>
+        <span className="fx-polls__label-currency">USD</span>
+      </div>
     </div>
-  );
-};
+  </div>
+);
 
 export default FxPollsBar;
 
+@import '~@scb/styles/css/index.scss';
 
 .fx-polls {
-  border: 1px solid #dcdcdc;
-  border-radius: 1rem;
-  padding: 1rem;
   width: 100%;
-  background: white;
+  border-radius: 2rem;
+  padding: 1rem;
+  margin-bottom: 10rem;
+  border: 2px solid transparent;
+  /* gradient border + rounded corners via dual backgrounds */
+  background-image:
+    linear-gradient(#ffffff, #ffffff),
+    linear-gradient(
+      86.56deg,
+      #00e14d 0.13%,
+      #e3e3e3 4.89%,
+      #e3e3e3 93.21%,
+      #19bcfc 100.13%
+    );
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
 
   &__labels {
     display: flex;
+    width: 100%;
     justify-content: space-between;
     font-weight: bold;
-    margin-bottom: 0.5rem;
+    gap: em(16);
   }
 
   &__label {
-    font-size: 1rem;
-
-    span {
-      display: block;
-      font-weight: normal;
-      font-size: 0.875rem;
-    }
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap;
+    font-size: em(13);
 
     &--sell {
+      align-items: flex-end;
       color: #b00020;
     }
-
     &--buy {
+      align-items: flex-start;
       color: #1b5e20;
-      text-align: right;
+    }
+
+    &-price {
+      margin-bottom: 0.25em;
+    }
+    &-currency {
+      font-size: 0.75em;
+      color: #000;
     }
   }
 
   &__bar {
     display: flex;
-    height: 12px;
-    width: 100%;
+    height: em(12);
+    width: 55%;
     overflow: hidden;
-    border-radius: 6px;
+    border-radius: em(6);
     background-color: #eee;
-  }
 
-  &__bar-segment {
-    height: 100%;
-
-    &--sell {
-      background-color: #d32f2f;
-      border-top-left-radius: 6px;
-      border-bottom-left-radius: 6px;
-    }
-
-    &--buy {
-      background-color: #388e3c;
-      border-top-right-radius: 6px;
-      border-bottom-right-radius: 6px;
+    &-segment {
+      &--sell {
+        background-color: #d32f2f;
+        border-top-left-radius: em(6);
+        border-bottom-left-radius: em(6);
+      }
+      &--gap {
+        display: block;
+        width: em(4);
+        height: em(4);
+        background-color: #fff;
+      }
+      &--buy {
+        background-color: #388e3c;
+        border-top-right-radius: em(6);
+        border-bottom-right-radius: em(6);
+      }
     }
   }
 }
