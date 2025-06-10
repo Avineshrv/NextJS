@@ -1,191 +1,52 @@
-.watchlist-popup {
-  position: fixed; inset: 0; z-index: 1000;
-  display: flex; justify-content: flex-end;
+// CutCard.jsx
+import React from 'react';
+import './CutCard.scss';
 
-  &__backdrop {
-    position: absolute; inset: 0;
-    background: rgba(0,0,0,0.5);
-  }
-
-  &__panel {
-    position: relative;
-    width: 100%; max-height: 100%;
-    background: #fff;
-    border-radius: 1rem 1rem 0 0;
-    overflow-y: auto;
-    transform: translateY(100%);
-    animation: slideUp 0.3s ease-out forwards;
-
-    &.closing {
-      animation: slideDown 0.3s ease-in forwards;
-    }
-  }
-
-  &__header {
-    display: flex; align-items: center;
-    padding: 1rem; border-bottom: 1px solid #eee;
-  }
-  &__close {
-    font-size: 1.5rem;
-    background: none; border: none;
-    margin-right: 1rem; cursor: pointer;
-  }
-  &__title {
-    font-size: 1.25rem; margin: 0;
-  }
-
-  &__filters {
-    display: flex; gap: 1rem;
-    overflow-x: auto; padding: 0 1rem; margin: 1rem 0;
-  }
-  &__filter-btn {
-    background: none; border: none;
-    padding: 0.5rem; font-size: 0.875rem;
-    color: #666; cursor: pointer;
-    &.active {
-      color: #333; font-weight: bold;
-      border-bottom: 2px solid #333;
-    }
-  }
-
-  &__metrics {
-    display: flex; justify-content: space-around;
-    padding: 1rem; border-bottom: 1px solid #eee;
-  }
-  &__metric {
-    text-align: center;
-    small { color: #666; font-size: 0.875rem; }
-    p { margin: 0.25rem 0 0; font-size: 1.25rem; color: #333; }
-  }
-
-  &__chart {
-    padding: 1rem;
-    &-placeholder {
-      height: 200px; background: #f5f5f5;
-      border-radius: 0.5rem;
-      display: flex; align-items: center;
-      justify-content: center; color: #999;
-    }
-  }
-
-  &__poll {
-    padding: 1rem;
-    &-bar {
-      display: flex; height: 0.75rem;
-      border-radius: 0.375rem; overflow: hidden;
-      background: #e0e0e0; margin-bottom: 0.5rem;
-      &-sell { background: #e74c3c; }
-      &-buy  { background: #27ae60; }
-    }
-    &-labels {
-      display: flex; justify-content: space-between;
-      .sell-label { color: #e74c3c; font-size: 0.875rem; }
-      .buy-label  { color: #27ae60; font-size: 0.875rem; }
-    }
-  }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
-}
-@keyframes slideDown {
-  from { transform: translateY(0); }
-  to   { transform: translateY(100%); }
-}
-
-
-import React, { useEffect, useState } from 'react';
-import './watchlist-popup.scss';
-
-export default function WatchlistPopup({ data, onClose }) {
-  const [closing, setClosing] = useState(false);
-  const [period, setPeriod] = useState('3M');
-  const periods = ['1D','1W','1M','3M','6M','1Y','5Y'];
-
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
-  }, []);
-
-  if (!data) return null;
-
-  const handleClose = () => {
-    setClosing(true);
-  };
-
-  const handleAnimationEnd = () => {
-    if (closing) onClose();
-  };
-
-  // dummy values
-  const dailyLow = '1.3424';
-  const dailyHigh = '1.3435';
-  const sellPct = 29, buyPct = 71;
-
+export default function CutCard({ title, children }) {
   return (
-    <div className="watchlist-popup">
-      <div className="watchlist-popup__backdrop" onClick={handleClose} />
-
-      <div
-        className={`watchlist-popup__panel${closing ? ' closing' : ''}`}
-        onAnimationEnd={handleAnimationEnd}
-      >
-        <header className="watchlist-popup__header">
-          <button className="watchlist-popup__close" onClick={handleClose}>
-            ×
-          </button>
-          <h2 className="watchlist-popup__title">
-            {data.from} → {data.to}
-          </h2>
-        </header>
-
-        <div className="watchlist-popup__filters">
-          {periods.map(p => (
-            <button
-              key={p}
-              className={`watchlist-popup__filter-btn${p === period ? ' active' : ''}`}
-              onClick={() => setPeriod(p)}
-            >
-              {p}
-            </button>
-          ))}
-        </div>
-
-        <section className="watchlist-popup__metrics">
-          <div className="watchlist-popup__metric">
-            <small>Daily Low</small>
-            <p>{dailyLow}</p>
-          </div>
-          <div className="watchlist-popup__metric">
-            <small>Daily High</small>
-            <p>{dailyHigh}</p>
-          </div>
-        </section>
-
-        <section className="watchlist-popup__chart">
-          <div className="watchlist-popup__chart-placeholder">
-            Chart for {period}
-          </div>
-        </section>
-
-        <section className="watchlist-popup__poll">
-          <div className="watchlist-popup__poll-bar">
-            <div
-              className="watchlist-popup__poll-sell"
-              style={{ width: `${sellPct}%` }}
-            />
-            <div
-              className="watchlist-popup__poll-buy"
-              style={{ width: `${buyPct}%` }}
-            />
-          </div>
-          <div className="watchlist-popup__poll-labels">
-            <span className="sell-label">Selling {sellPct}%</span>
-            <span className="buy-label">Buying {buyPct}%</span>
-          </div>
-        </section>
-      </div>
+    <div className="cut-card">
+      <h2 className="cut-card__title">{title}</h2>
+      <div className="cut-card__body">{children}</div>
     </div>
   );
+}
+
+/* CutCard.scss */
+$notch-diameter: 40px;
+$notch-radius: $notch-diameter / 2;
+$page-bg: #f0f0f0;  /* change to your page’s background */
+
+.cut-card {
+  position: relative;
+  overflow: visible;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+
+  /* left & right notches */
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: $notch-diameter;
+    height: $notch-diameter;
+    background: $page-bg;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &::before { left: -$notch-radius; }
+  &::after  { right: -$notch-radius; }
+
+  &__title {
+    margin: 0 0 12px;
+    font-size: 1.25rem;
+    text-align: center;
+  }
+
+  &__body {
+    /* your body styles here */
+  }
 }
